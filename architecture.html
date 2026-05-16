@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ApexAssist · Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotetz:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/css/styles.css"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a0c12'/%3E%3Cpath d='M16 44 L32 16 L48 44 Z' fill='%239775FA'/%3E%3C/svg%3E"/>
+<style>
+/* Flow diagram styles */
+@keyframes dashFlow {
+  to { stroke-dashoffset: -20; }
+}
+@keyframes dotPulse {
+  0%,100% { r: 4; opacity: .8; }
+  50% { r: 6; opacity: 1; }
+}
+@keyframes nodeFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes diamondPulse {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(151,117,250,.2)); }
+  50% { filter: drop-shadow(0 0 20px rgba(151,117,250,.4)); }
+}
+.flow-dash {
+  stroke-dasharray: 6 8;
+  animation: dashFlow 1s linear infinite;
+}
+.flow-dot {
+  animation: dotPulse 2s ease-in-out infinite;
+}
+.flow-card {
+  cursor: default;
+  transition: filter .2s ease;
+}
+.flow-card:hover {
+  filter: brightness(1.15);
+}
+.diamond-node {
+  animation: diamondPulse 3s ease-in-out infinite;
+}
+/* Diagram container */
+.arch-diagram {
+  width: 100%;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+.arch-diagram svg {
+  min-width: 900px;
+  display: block;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg viewBox="0 0 64 64">
+      <defs><linearGradient id="lg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#9775FA"/><stop offset="1" stop-color="#F06292"/></linearGradient></defs>
+      <rect width="64" height="64" rx="14" fill="#0a0c12" stroke="rgba(255,255,255,.06)"/>
+      <path d="M16 46 L32 16 L48 46 Z" fill="url(#lg)"/>
+      <circle cx="32" cy="38" r="3.5" fill="#0a0c12"/>
+    </svg>
+    <div>
+      <div class="name">ApexAssist</div>
+      <div class="sub">BY Genpact</div>
+    </div>
+  </div>
+
+  <div class="sidebar-search">
+    <span style="opacity:.45">⌕</span>
+    <span>Quick jump</span>
+    <span class="sidebar-shortcut">⌘K</span>
+  </div>
+
+  <div class="sidebar-section">Command</div>
+  <a href="index.html" class="sidebar-link">
+    <span class="icon">◆</span> Command Center
+  </a>
+  <a href="demo.html" class="sidebar-link">
+    <span class="icon">▶</span> Live Orchestrator
+    <span class="sidebar-badge">10</span>
+  </a>
+  <a href="architecture.html" class="sidebar-link active">
+    <span class="icon">△</span> Architecture
+  </a>
+
+  <div class="sidebar-section">Layers</div>
+  <a href="#signals" class="sidebar-link"><span class="icon">◎</span> Signals</a>
+  <a href="#context" class="sidebar-link"><span class="icon">◈</span> Context</a>
+  <a href="#reasoning" class="sidebar-link"><span class="icon">◇</span> Reasoning</a>
+  <a href="#action" class="sidebar-link"><span class="icon">▷</span> Action</a>
+  <a href="#learning" class="sidebar-link"><span class="icon">↻</span> Learning</a>
+
+  <div class="sidebar-footer">
+    <div class="flex items-center gap-2 text-[11px]">
+      <span style="font-size:13px;opacity:.5">⚙</span>
+      <span class="font-mono tracking-widest text-[color:var(--tx-3)]" style="font-size:10px">WORKER</span>
+      <span class="ml-auto dot-green status-dot"></span>
+      <span style="color:#4ADE80;font-size:11px">healthy</span>
+    </div>
+    <div class="text-[10px] font-mono text-[color:var(--tx-3)] mt-2">8 agents · all online<br>poll ok · 12s ago</div>
+    <div class="worker-bar mt-2"></div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<div class="main-area">
+
+  <!-- Section header -->
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-eyebrow">
+        <span>PLATFORM ARCHITECTURE</span>
+        <span class="pill pill-green" style="font-size:10px"><span class="dot-green status-dot"></span> ALL AGENTS ONLINE</span>
+      </div>
+      <h1 class="section-title">Incident Resolution Flow</h1>
+      <p class="section-desc">End-to-end signal → resolution pipeline with policy-governed agent orchestration</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="demo.html" class="btn btn-primary text-[12px]">▶ See it in action</a>
+      <div class="avatar">SR</div>
+    </div>
+  </div>
+
+  <!-- ========== FLOW DIAGRAM ========== -->
+  <div class="card-glow mb-6" style="padding:32px 24px; overflow:hidden;">
+    <div class="arch-diagram">
+      <svg viewBox="0 0 960 1520" width="100%" height="auto">
+        <defs>
+          <linearGradient id="gPurple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9775FA"/><stop offset="1" stop-color="#F06292"/></linearGradient>
+          <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4ADE80"/><stop offset="1" stop-color="#22D3EE"/></linearGradient>
+          <linearGradient id="gAmber" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>
+          <linearGradient id="gCoral" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F06292"/><stop offset="1" stop-color="#FF4F59"/></linearGradient>
+          <linearGradient id="gCyan" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#4ADE80"/></linearGradient>
+          <filter id="glow3"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow4"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+
+        <!-- ==================== CONNECTION LINES ==================== -->
+        <!-- Trigger → Sources -->
+        <line x1="480" y1="52" x2="480" y2="90" stroke="#4ADE80" stroke-width="1.5" class="flow-dash" opacity=".6"/>
+
+        <!-- Source verticals down to junction -->
+        <line x1="190" y1="170" x2="190" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="420" y1="170" x2="420" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="650" y1="170" x2="650" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="850" y1="170" x2="850" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1.5" class="flow-dash"/>
+
+        <!-- Junction horizontal -->
+        <line x1="190" y1="280" x2="850" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1.5" class="flow-dash"/>
+
+        <!-- Junction down to Context Fabric -->
+        <line x1="480" y1="280" x2="480" y2="320" stroke="rgba(255,255,255,.15)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="480" cy="280" r="4" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Context cards horizontal connectors -->
+        <line x1="340" y1="370" x2="370" y2="370" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="600" y1="370" x2="630" y2="370" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="370" cy="370" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        <circle cx="630" cy="370" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Context down to Orchestrator -->
+        <line x1="480" y1="410" x2="480" y2="470" stroke="rgba(151,117,250,.3)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="480" cy="440" r="4" fill="#9775FA" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Orchestrator to specialists -->
+        <line x1="440" y1="540" x2="135" y2="640" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="440" y1="560" x2="350" y2="640" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="520" y1="560" x2="560" y2="640" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="520" y1="540" x2="785" y2="640" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="135" cy="640" r="3.5" fill="#FBBF24" filter="url(#glow4)" class="flow-dot"/>
+        <circle cx="350" cy="640" r="3.5" fill="#F06292" filter="url(#glow4)" class="flow-dot"/>
+        <circle cx="560" cy="640" r="3.5" fill="#9775FA" filter="url(#glow4)" class="flow-dot"/>
+        <circle cx="785" cy="640" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Specialists down to Router junction -->
+        <line x1="135" y1="720" x2="135" y2="810" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="350" y1="720" x2="350" y2="810" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="560" y1="720" x2="560" y2="810" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="785" y1="720" x2="785" y2="810" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <!-- Horizontal junction before router -->
+        <line x1="135" y1="810" x2="785" y2="810" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="480" cy="810" r="4" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Junction to Validator Agent diamond -->
+        <line x1="480" y1="810" x2="480" y2="860" stroke="rgba(255,255,255,.15)" stroke-width="1.5" class="flow-dash"/>
+
+        <!-- Validator to Router -->
+        <line x1="480" y1="940" x2="480" y2="980" stroke="rgba(255,255,255,.15)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="480" cy="960" r="4" fill="#9775FA" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Router PATH A and PATH B -->
+        <line x1="440" y1="1030" x2="240" y2="1100" stroke="rgba(240,98,146,.2)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="520" y1="1030" x2="720" y2="1100" stroke="rgba(74,222,128,.2)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="240" cy="1100" r="3.5" fill="#F06292" filter="url(#glow4)" class="flow-dot"/>
+        <circle cx="720" cy="1100" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+
+        <!-- Action cards down to Knowledge junction -->
+        <line x1="240" y1="1190" x2="240" y2="1260" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="720" y1="1190" x2="720" y2="1260" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <line x1="240" y1="1260" x2="720" y2="1260" stroke="rgba(255,255,255,.1)" stroke-width="1.5" class="flow-dash"/>
+        <circle cx="480" cy="1260" r="4" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        <line x1="480" y1="1260" x2="480" y2="1300" stroke="rgba(255,255,255,.15)" stroke-width="1.5" class="flow-dash"/>
+
+        <!-- Knowledge to feedback -->
+        <line x1="480" y1="1390" x2="480" y2="1430" stroke="rgba(151,117,250,.25)" stroke-width="1.5" class="flow-dash"/>
+
+        <!-- Feedback loop arrow (curved, going back up) -->
+        <path d="M480 1470 L480 1490 Q480 1510 500 1510 L920 1510 Q940 1510 940 1490 L940 280 Q940 260 920 260 L860 260" stroke="rgba(151,117,250,.15)" stroke-width="1.5" fill="none" class="flow-dash"/>
+        <circle cx="940" cy="900" r="3" fill="#9775FA" filter="url(#glow4)" class="flow-dot" style="animation-delay:.5s"/>
+        <circle cx="940" cy="500" r="3" fill="#9775FA" filter="url(#glow4)" class="flow-dot" style="animation-delay:1s"/>
+
+
+        <!-- ==================== NODES ==================== -->
+
+        <!-- TRIGGER (play button circle) -->
+        <g class="flow-card">
+          <circle cx="480" cy="36" r="24" fill="#4ADE80" filter="url(#glow3)"/>
+          <polygon points="473,26 473,46 491,36" fill="#0a0c12"/>
+        </g>
+        <text x="480" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)" letter-spacing=".12em">INCIDENT TRIGGER</text>
+
+
+        <!-- SIGNAL SOURCE CARDS -->
+        <!-- Datadog / OTel -->
+        <g class="flow-card" id="signals">
+          <rect x="90" y="100" width="200" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.08)"/>
+          <circle cx="125" cy="131" r="16" fill="rgba(34,211,238,.12)" stroke="rgba(34,211,238,.3)"/>
+          <text x="125" y="136" text-anchor="middle" font-size="14">📡</text>
+          <text x="155" y="125" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Datadog · OTel</text>
+          <text x="155" y="143" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">APM Traces &amp; Metrics</text>
+          <circle cx="190" cy="170" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- ServiceNow / Jira -->
+        <g class="flow-card">
+          <rect x="320" y="100" width="200" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.08)"/>
+          <circle cx="355" cy="131" r="16" fill="rgba(251,191,36,.12)" stroke="rgba(251,191,36,.3)"/>
+          <text x="355" y="136" text-anchor="middle" font-size="14">🎫</text>
+          <text x="385" y="125" font-family="Inter" font-size="13" font-weight="600" fill="#fff">ServiceNow · Jira</text>
+          <text x="385" y="143" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">Tickets &amp; Changes</text>
+          <circle cx="420" cy="170" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- GitHub / ArgoCD -->
+        <g class="flow-card">
+          <rect x="550" y="100" width="200" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.08)"/>
+          <circle cx="585" cy="131" r="16" fill="rgba(74,222,128,.12)" stroke="rgba(74,222,128,.3)"/>
+          <text x="585" y="136" text-anchor="middle" font-size="14">🔄</text>
+          <text x="615" y="125" font-family="Inter" font-size="13" font-weight="600" fill="#fff">GitHub · ArgoCD</text>
+          <text x="615" y="143" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">Deploy &amp; Change Feed</text>
+          <circle cx="650" cy="170" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- CMDB -->
+        <g class="flow-card">
+          <rect x="780" y="100" width="155" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.08)"/>
+          <circle cx="815" cy="131" r="16" fill="rgba(151,117,250,.12)" stroke="rgba(151,117,250,.3)"/>
+          <text x="815" y="136" text-anchor="middle" font-size="14">🗺</text>
+          <text x="845" y="125" font-family="Inter" font-size="13" font-weight="600" fill="#fff">CMDB</text>
+          <text x="845" y="143" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">Topology Graph</text>
+          <circle cx="850" cy="170" r="3.5" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- LAYER LABEL: SIGNALS -->
+        <text x="30" y="135" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.25)" letter-spacing=".14em" transform="rotate(-90,30,135)">SIGNALS</text>
+
+
+        <!-- ==================== CONTEXT LAYER ==================== -->
+        <text x="30" y="370" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.25)" letter-spacing=".14em" transform="rotate(-90,30,370)">CONTEXT</text>
+
+        <!-- Context Fabric -->
+        <g class="flow-card" id="context">
+          <rect x="100" y="320" width="240" height="90" rx="14" fill="rgba(14,17,26,.9)" stroke="rgba(151,117,250,.15)"/>
+          <circle cx="135" cy="355" r="16" fill="rgba(151,117,250,.12)" stroke="rgba(151,117,250,.3)"/>
+          <text x="135" y="360" text-anchor="middle" font-size="14">🧬</text>
+          <text x="165" y="348" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Context Fabric</text>
+          <text x="165" y="366" font-family="JetBrains Mono" font-size="9.5" fill="rgba(255,255,255,.4)">stream · dedup · enrich</text>
+          <text x="165" y="396" font-family="JetBrains Mono" font-size="9" fill="#4ADE80">● dedup 62%  ● PII redacted</text>
+        </g>
+
+        <!-- Vector + Graph Memory -->
+        <g class="flow-card">
+          <rect x="370" y="320" width="230" height="90" rx="14" fill="rgba(14,17,26,.9)" stroke="rgba(151,117,250,.15)"/>
+          <circle cx="405" cy="355" r="16" fill="rgba(240,98,146,.12)" stroke="rgba(240,98,146,.3)"/>
+          <text x="405" y="360" text-anchor="middle" font-size="14">🧠</text>
+          <text x="435" y="348" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Vector + Graph</text>
+          <text x="435" y="366" font-family="JetBrains Mono" font-size="9.5" fill="rgba(255,255,255,.4)">runbooks · postmortems</text>
+          <text x="435" y="396" font-family="JetBrains Mono" font-size="9" fill="#9775FA">● 2.4k docs  ● 847 edges</text>
+        </g>
+
+        <!-- Policy Engine -->
+        <g class="flow-card">
+          <rect x="630" y="320" width="230" height="90" rx="14" fill="rgba(14,17,26,.9)" stroke="rgba(251,191,36,.12)"/>
+          <circle cx="665" cy="355" r="16" fill="rgba(251,191,36,.12)" stroke="rgba(251,191,36,.3)"/>
+          <text x="665" y="360" text-anchor="middle" font-size="14">🛡</text>
+          <text x="695" y="348" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Policy (OPA)</text>
+          <text x="695" y="366" font-family="JetBrains Mono" font-size="9.5" fill="rgba(255,255,255,.4)">blast-radius · env rules</text>
+          <text x="695" y="396" font-family="JetBrains Mono" font-size="9" fill="#FBBF24">● 142 rules  ● enforced</text>
+        </g>
+
+
+        <!-- ==================== ORCHESTRATOR (DIAMOND) ==================== -->
+        <text x="30" y="540" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.25)" letter-spacing=".14em" transform="rotate(-90,30,540)" id="reasoning">REASONING</text>
+
+        <g class="diamond-node">
+          <!-- Diamond shape -->
+          <polygon points="480,470 560,540 480,610 400,540" fill="rgba(151,117,250,.08)" stroke="#9775FA" stroke-width="1.5"/>
+          <!-- Outer ring glow -->
+          <polygon points="480,470 560,540 480,610 400,540" fill="none" stroke="rgba(151,117,250,.15)" stroke-width="8" filter="url(#glow3)"/>
+          <!-- Inner icon circle -->
+          <circle cx="480" cy="525" r="22" fill="rgba(151,117,250,.15)" stroke="rgba(151,117,250,.4)"/>
+          <text x="480" y="531" text-anchor="middle" font-size="18">⬡</text>
+        </g>
+        <text x="480" y="625" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="700" fill="#fff">Orchestrator</text>
+          <text x="480" y="643" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#C4B5FD">Claude Sonnet 4 · central brain</text>
+        <!-- Left/right arrows on diamond -->
+        <text x="385" y="544" text-anchor="middle" font-family="Inter" font-size="14" fill="rgba(255,255,255,.25)">‹</text>
+        <text x="575" y="544" text-anchor="middle" font-family="Inter" font-size="14" fill="rgba(255,255,255,.25)">›</text>
+
+
+        <!-- ==================== SPECIALIST AGENTS ==================== -->
+        <!-- Detector -->
+        <g class="flow-card">
+          <rect x="30" y="660" width="210" height="55" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(251,191,36,.15)"/>
+          <circle cx="60" cy="688" r="14" fill="rgba(251,191,36,.12)" stroke="rgba(251,191,36,.3)"/>
+          <text x="60" y="693" text-anchor="middle" font-size="12">🔍</text>
+          <text x="85" y="682" font-family="Inter" font-size="12" font-weight="600" fill="#FCD34D">Monitoring</text>
+          <text x="85" y="698" font-family="JetBrains Mono" font-size="8.5" fill="rgba(255,255,255,.4)">signal correlation</text>
+          <circle cx="30" cy="688" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- Triage -->
+        <g class="flow-card">
+          <rect x="250" y="660" width="200" height="55" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(240,98,146,.15)"/>
+          <circle cx="280" cy="688" r="14" fill="rgba(240,98,146,.12)" stroke="rgba(240,98,146,.3)"/>
+          <text x="280" y="693" text-anchor="middle" font-size="12">📋</text>
+          <text x="305" y="682" font-family="Inter" font-size="12" font-weight="600" fill="#F8A4C0">Triage</text>
+          <text x="305" y="698" font-family="JetBrains Mono" font-size="8.5" fill="rgba(255,255,255,.4)">severity scoring</text>
+          <circle cx="250" cy="688" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- RCA -->
+        <g class="flow-card">
+          <rect x="460" y="660" width="200" height="55" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(151,117,250,.15)"/>
+          <circle cx="490" cy="688" r="14" fill="rgba(151,117,250,.12)" stroke="rgba(151,117,250,.3)"/>
+          <text x="490" y="693" text-anchor="middle" font-size="12">🧬</text>
+          <text x="515" y="682" font-family="Inter" font-size="12" font-weight="600" fill="#C4B5FD">RCA</text>
+          <text x="515" y="698" font-family="JetBrains Mono" font-size="8.5" fill="rgba(255,255,255,.4)">causal inference</text>
+          <circle cx="460" cy="688" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- Remediator -->
+        <g class="flow-card">
+          <rect x="670" y="660" width="230" height="55" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(74,222,128,.15)"/>
+          <circle cx="700" cy="688" r="14" fill="rgba(74,222,128,.12)" stroke="rgba(74,222,128,.3)"/>
+          <text x="700" y="693" text-anchor="middle" font-size="12">🔧</text>
+          <text x="725" y="682" font-family="Inter" font-size="12" font-weight="600" fill="#86EFAC">Self Heal</text>
+          <text x="725" y="698" font-family="JetBrains Mono" font-size="8.5" fill="rgba(255,255,255,.4)">auto-remediation</text>
+          <circle cx="900" cy="688" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- Second row specialists: Validator, Comms, Knowledge -->
+        <!-- (smaller, shown as pills below the junction) -->
+        <g class="flow-card">
+          <rect x="120" y="756" width="165" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(232,121,168,.12)"/>
+          <text x="130" y="781" font-size="11">✅</text>
+          <text x="149" y="781" font-family="Inter" font-size="11" font-weight="600" fill="#E8A4D4">Validator</text>
+          <text x="225" y="781" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.35)">SLO gate</text>
+        </g>
+        <g class="flow-card">
+          <rect x="300" y="756" width="170" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(34,211,238,.12)"/>
+          <text x="310" y="781" font-size="11">📢</text>
+          <text x="329" y="781" font-family="Inter" font-size="11" font-weight="600" fill="#67E8F9">Smart Notify</text>
+          <text x="420" y="781" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.35)">multi-ch</text>
+        </g>
+        <g class="flow-card">
+          <rect x="485" y="756" width="185" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.08)"/>
+          <text x="495" y="781" font-size="11">📚</text>
+          <text x="514" y="781" font-family="Inter" font-size="11" font-weight="600" fill="#D4D6E0">Learning Engine</text>
+          <text x="630" y="781" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.35)">evolve</text>
+        </g>
+
+
+        <!-- ==================== VALIDATOR DIAMOND ==================== -->
+        <text x="30" y="910" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.25)" letter-spacing=".14em" transform="rotate(-90,30,910)" id="action">ACTION</text>
+
+        <g class="diamond-node">
+          <polygon points="480,865 540,905 480,945 420,905" fill="rgba(74,222,128,.06)" stroke="#4ADE80" stroke-width="1.5"/>
+          <polygon points="480,865 540,905 480,945 420,905" fill="none" stroke="rgba(74,222,128,.1)" stroke-width="6" filter="url(#glow3)"/>
+          <circle cx="480" cy="900" r="16" fill="rgba(74,222,128,.12)" stroke="rgba(74,222,128,.35)"/>
+          <text x="480" y="906" text-anchor="middle" font-size="14">✅</text>
+        </g>
+        <text x="480" y="966" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#fff">SLO Validator</text>
+        <text x="480" y="982" text-anchor="middle" font-family="JetBrains Mono" font-size="9.5" fill="rgba(255,255,255,.4)">Canary Check · Confidence Gate</text>
+
+
+        <!-- ==================== ROUTER DIAMOND ==================== -->
+        <g class="diamond-node">
+          <polygon points="480,990 530,1025 480,1060 430,1025" fill="rgba(251,191,36,.06)" stroke="#FBBF24" stroke-width="1.5"/>
+          <circle cx="480" cy="1022" r="12" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.3)"/>
+          <text x="480" y="1028" text-anchor="middle" font-size="10" fill="#FBBF24">×</text>
+        </g>
+        <text x="480" y="1078" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#fff">Router</text>
+        <text x="480" y="1093" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.35)">Severity &amp; Policy Gate</text>
+
+        <!-- PATH LABELS -->
+        <text x="320" y="1085" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.3)" letter-spacing=".1em">PATH A</text>
+        <rect x="290" y="1092" width="80" height="20" rx="10" fill="rgba(240,98,146,.1)" stroke="rgba(240,98,146,.25)"/>
+        <text x="330" y="1106" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="500" fill="#F8A4C0">High Risk</text>
+
+        <text x="660" y="1085" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.3)" letter-spacing=".1em">PATH B</text>
+        <rect x="625" y="1092" width="80" height="20" rx="10" fill="rgba(74,222,128,.1)" stroke="rgba(74,222,128,.25)"/>
+        <text x="665" y="1106" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="500" fill="#86EFAC">Low Risk</text>
+
+
+        <!-- ==================== ACTION CARDS ==================== -->
+        <!-- PATH A: Human Gate -->
+        <g class="flow-card">
+          <rect x="140" y="1120" width="200" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(240,98,146,.15)"/>
+          <circle cx="175" cy="1151" r="16" fill="rgba(240,98,146,.12)" stroke="rgba(240,98,146,.3)"/>
+          <text x="175" y="1156" text-anchor="middle" font-size="14">🔒</text>
+          <text x="205" y="1144" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Human Gate</text>
+          <text x="205" y="1162" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">approval + audit trail</text>
+          <circle cx="340" cy="1151" r="3" fill="#F06292" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- PATH B: Auto-execute -->
+        <g class="flow-card">
+          <rect x="620" y="1120" width="200" height="62" rx="12" fill="rgba(14,17,26,.9)" stroke="rgba(74,222,128,.15)"/>
+          <circle cx="655" cy="1151" r="16" fill="rgba(74,222,128,.12)" stroke="rgba(74,222,128,.3)"/>
+          <text x="655" y="1156" text-anchor="middle" font-size="14">⚡</text>
+          <text x="685" y="1144" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Auto-execute</text>
+          <text x="685" y="1162" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">tool-use · k8s · cloud</text>
+          <circle cx="620" cy="1151" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- Comms output cards -->
+        <g class="flow-card">
+          <rect x="140" y="1200" width="95" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.06)"/>
+          <text x="150" y="1225" font-size="11">🎫</text>
+          <text x="167" y="1225" font-family="Inter" font-size="10.5" font-weight="600" fill="#fff">Jira</text>
+          <text x="224" y="1225" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.3)">ticket</text>
+          <circle cx="140" cy="1220" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+        <g class="flow-card">
+          <rect x="245" y="1200" width="95" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.06)"/>
+          <text x="255" y="1225" font-size="11">💬</text>
+          <text x="272" y="1225" font-family="Inter" font-size="10.5" font-weight="600" fill="#fff">Slack</text>
+          <text x="329" y="1225" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.3)">#ops</text>
+          <circle cx="340" cy="1220" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+        <g class="flow-card">
+          <rect x="625" y="1200" width="95" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.06)"/>
+          <text x="635" y="1225" font-size="11">☸</text>
+          <text x="652" y="1225" font-family="Inter" font-size="10.5" font-weight="600" fill="#fff">K8s</text>
+          <text x="709" y="1225" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.3)">apply</text>
+          <circle cx="625" cy="1220" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+        <g class="flow-card">
+          <rect x="730" y="1200" width="95" height="40" rx="10" fill="rgba(14,17,26,.9)" stroke="rgba(255,255,255,.06)"/>
+          <text x="740" y="1225" font-size="11">☁</text>
+          <text x="757" y="1225" font-family="Inter" font-size="10.5" font-weight="600" fill="#fff">Cloud</text>
+          <text x="814" y="1225" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,.3)">API</text>
+          <circle cx="825" cy="1220" r="3" fill="#4ADE80" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+
+        <!-- ==================== KNOWLEDGE / LEARNING ==================== -->
+        <text x="30" y="1360" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,.25)" letter-spacing=".14em" transform="rotate(-90,30,1360)" id="learning">LEARNING</text>
+
+        <g class="flow-card">
+          <rect x="280" y="1300" width="400" height="85" rx="14" fill="rgba(151,117,250,.05)" stroke="rgba(151,117,250,.15)"/>
+          <circle cx="320" cy="1340" r="18" fill="rgba(151,117,250,.1)" stroke="rgba(151,117,250,.3)"/>
+          <text x="320" y="1346" text-anchor="middle" font-size="16">📝</text>
+          <text x="360" y="1328" font-family="Inter" font-size="14" font-weight="600" fill="#fff">Learning Engine</text>
+          <text x="360" y="1346" font-family="JetBrains Mono" font-size="10" fill="rgba(255,255,255,.4)">Postmortem-as-code · Continuous Eval</text>
+          <text x="360" y="1370" font-family="JetBrains Mono" font-size="9" fill="#9775FA">847 runbooks · 98.7% eval pass · v47 prompts</text>
+          <circle cx="680" cy="1342" r="3.5" fill="#9775FA" filter="url(#glow4)" class="flow-dot"/>
+        </g>
+
+        <!-- Feedback loop label -->
+        <g>
+          <rect x="380" y="1420" width="200" height="28" rx="14" fill="rgba(151,117,250,.06)" stroke="rgba(151,117,250,.12)"/>
+          <text x="480" y="1439" text-anchor="middle" font-family="JetBrains Mono" font-size="9.5" fill="#C4B5FD">↑ feedback loop · continuous</text>
+        </g>
+
+        <!-- Feedback arrow label on right edge -->
+        <text x="945" y="700" font-family="JetBrains Mono" font-size="8" fill="rgba(151,117,250,.3)" letter-spacing=".1em" transform="rotate(90,945,700)">FEEDBACK · LEARNING LOOP</text>
+
+      </svg>
+    </div>
+  </div>
+
+  <!-- Reference stack -->
+  <div class="card mb-6">
+    <div class="eyebrow mb-2">REFERENCE STACK</div>
+    <div class="font-display text-lg font-semibold mb-4">Production-grade technology choices</div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#9775FA,#F06292)"><div class="kpi-label" style="font-size:9px">Reasoning</div><div class="font-semibold text-[13px] mt-1">Claude Sonnet 4</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#4ADE80,#22D3EE)"><div class="kpi-label" style="font-size:9px">Runtime</div><div class="font-semibold text-[13px] mt-1">Python · FastAPI</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#22D3EE,#9775FA)"><div class="kpi-label" style="font-size:9px">Memory</div><div class="font-semibold text-[13px] mt-1">pgvector + Neo4j</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#FBBF24,#F06292)"><div class="kpi-label" style="font-size:9px">Policy</div><div class="font-semibold text-[13px] mt-1">OPA · Rego</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#F06292,#9775FA)"><div class="kpi-label" style="font-size:9px">Event Bus</div><div class="font-semibold text-[13px] mt-1">Kafka / Redpanda</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#4ADE80,#FBBF24)"><div class="kpi-label" style="font-size:9px">Action</div><div class="font-semibold text-[13px] mt-1">Argo Workflows</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#22D3EE,#4ADE80)"><div class="kpi-label" style="font-size:9px">UI</div><div class="font-semibold text-[13px] mt-1">Next.js · Tailwind</div></div>
+      <div class="kpi" style="padding:12px 14px;--kpi-accent:linear-gradient(90deg,#9775FA,#22D3EE)"><div class="kpi-label" style="font-size:9px">Evals</div><div class="font-semibold text-[13px] mt-1">PromptLayer</div></div>
+    </div>
+  </div>
+
+  <!-- Why this wins -->
+  <div class="card-glow mb-6">
+    <div class="eyebrow mb-3">WHY THIS WINS</div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div>
+        <div class="font-display text-lg font-semibold mb-2">Strategic for Genpact</div>
+        <p class="text-[13px] text-[color:var(--tx-2)] leading-relaxed">Directly attacks the largest operational cost center in our ITS portfolio. Proven 87% MTTR reduction.</p>
+      </div>
+      <div>
+        <div class="font-display text-lg font-semibold mb-2">True agentic system</div>
+        <p class="text-[13px] text-[color:var(--tx-2)] leading-relaxed">Not a chat wrapper — specialized agents with planning, reflection, tool-use, memory and continuous learning.</p>
+      </div>
+      <div>
+        <div class="font-display text-lg font-semibold mb-2">Safe by construction</div>
+        <p class="text-[13px] text-[color:var(--tx-2)] leading-relaxed">Policy engine, human approval gates, PII redaction and full audit trail built into the architecture from day one.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="flex items-center justify-between text-[12px] text-[color:var(--tx-3)] py-6 border-t border-white/5">
+    <div class="flex items-center gap-2"><span class="brand-dot"></span> ApexAssist · Genpact GenAI Hackathon 2026</div>
+    <div class="font-mono">Built with Claude · simulated telemetry</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  /* Reveal on scroll */
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('in');
+  }), {threshold: .1});
+  document.querySelectorAll('.reveal,.arch-reveal').forEach(n => io.observe(n));
+})();
+</script>
+</body>
+</html>

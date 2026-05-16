@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ApexAssist · Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/css/styles.css"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a0c12'/%3E%3Cpath d='M16 44 L32 16 L48 44 Z' fill='%239775FA'/%3E%3C/svg%3E"/>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/glogo.jpg" alt="Genpact" class="brand-logo" width="34" height="34">
+    <div>
+      <div class="name">ApexAssist</div>
+      <div class="sub">BY Genpact</div>
+    </div>
+  </div>
+
+  <div class="sidebar-search">
+    <span style="opacity:.45">⌕</span>
+    <span>Quick jump</span>
+    <span class="sidebar-shortcut">⌘K</span>
+  </div>
+
+  <div class="sidebar-section">Command</div>
+  <a href="index.html" class="sidebar-link active">
+    <span class="icon">◆</span> Command Center
+  </a>
+  <a href="demo.html" class="sidebar-link">
+    <span class="icon">▶</span> Live Orchestrator
+    <span class="sidebar-badge">10</span>
+  </a>
+  <a href="architecture.html" class="sidebar-link">
+    <span class="icon">△</span> Architecture
+  </a>
+
+  <div class="sidebar-section">Agents</div>
+  <a href="#agents" class="sidebar-link">
+    <span class="icon">◎</span> Agent Network
+  </a>
+  <a href="#responsible" class="sidebar-link">
+    <span class="icon">◇</span> Responsible AI
+  </a>
+
+  <div class="sidebar-footer">
+    <div class="flex items-center gap-2 text-[11px]">
+      <span style="font-size:13px;opacity:.5">⚙</span>
+      <span class="font-mono tracking-widest text-[color:var(--tx-3)]" style="font-size:10px">WORKER</span>
+      <span class="ml-auto dot-green status-dot"></span>
+      <span style="color:#4ADE80;font-size:11px">healthy</span>
+    </div>
+    <div class="text-[10px] font-mono text-[color:var(--tx-3)] mt-2">8 agents · all online<br>poll ok · 12s ago</div>
+    <div class="worker-bar mt-2"></div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<div class="main-area">
+
+  <!-- Section header -->
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">
+        <span>AUTONOMOUS ITOPS</span>
+        <span class="pill pill-green" style="font-size:10px"><span class="dot-green status-dot"></span> ALL AGENTS ONLINE</span>
+      </div>
+      <h1 class="section-title">Command Center</h1>
+      <p class="section-desc">End-to-end autonomous incident management powered by Claude</p>
+    </div>
+    <div class="section-stats">
+      <div class="stat-box">
+        <div class="stat-label">AGENTS</div>
+        <div class="stat-value">8</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">INCIDENTS / D</div>
+        <div class="stat-value" id="statIncidents">47</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Filters -->
+  <div id="globalFilters" class="filter-bar mb-4">
+    <div class="filter-group">
+      <span class="filter-label">ENV</span>
+      <div class="filter-pills" data-filter="env">
+        <button class="filter-pill active" data-value="prod">Production</button>
+        <button class="filter-pill" data-value="staging">Staging</button>
+        <button class="filter-pill" data-value="dev">Dev</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">CLUSTER</span>
+      <div class="filter-pills" data-filter="cluster">
+        <button class="filter-pill active" data-value="all">All Services</button>
+        <button class="filter-pill" data-value="orders">Orders</button>
+        <button class="filter-pill" data-value="payments">Payments</button>
+        <button class="filter-pill" data-value="auth">Auth</button>
+        <button class="filter-pill" data-value="infra">Infra</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">SEV</span>
+      <div class="filter-pills" data-filter="severity">
+        <button class="filter-pill active" data-value="all">All</button>
+        <button class="filter-pill" data-value="p1">P1</button>
+        <button class="filter-pill" data-value="p2">P2</button>
+        <button class="filter-pill" data-value="p3">P3</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">TIME</span>
+      <div class="filter-pills" data-filter="timeRange">
+        <button class="filter-pill" data-value="24h">24h</button>
+        <button class="filter-pill" data-value="7d">7d</button>
+        <button class="filter-pill active" data-value="30d">30d</button>
+        <button class="filter-pill" data-value="90d">90d</button>
+      </div>
+    </div>
+    <div class="filter-right">
+      <span class="filter-live"><span class="dot-green status-dot"></span> LIVE</span>
+      <span id="liveClock" class="font-mono" style="font-size:11px;color:var(--tx-3)">--:--:--</span>
+      <span id="lastRefresh" class="font-mono" style="font-size:10px;color:var(--tx-3)">↻ 3s ago</span>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#22C55E,#06B6D4)">
+      <div class="kpi-label">MTTR reduction</div>
+      <div class="kpi-value"><span data-counter="87" data-suffix="%">0</span></div>
+      <div class="kpi-delta delta-up">▼ 20m→2m 41s</div>
+    </div>
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#8B5CF6,#EC4899)">
+      <div class="kpi-label">Auto-resolved</div>
+      <div class="kpi-value"><span data-counter="73" data-suffix="%">0</span></div>
+      <div class="kpi-delta delta-up">▲ 4.1 pts</div>
+    </div>
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#EC4899,#FF4F59)">
+      <div class="kpi-label">RCAs delivered</div>
+      <div class="kpi-value"><span data-counter="1284">0</span></div>
+      <div class="kpi-delta delta-up">▲ <span id="rcaToday">14</span> today</div>
+    </div>
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#06B6D4,#22C55E)">
+      <div class="kpi-label">Self-healed today</div>
+      <div class="kpi-value"><span id="selfHealed" data-counter="98">0</span></div>
+      <div class="kpi-delta delta-up">▲ 12 vs yesterday</div>
+    </div>
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#F59E0B,#FF4F59)">
+      <div class="kpi-label">Noise suppressed</div>
+      <div class="kpi-value"><span data-counter="62" data-suffix="%">0</span></div>
+      <div class="kpi-delta delta-up">▲ 8 pts</div>
+    </div>
+    <div class="kpi" style="--kpi-accent:linear-gradient(90deg,#FF4F59,#EC4899)">
+      <div class="kpi-label">P1s prevented</div>
+      <div class="kpi-value"><span data-counter="47">0</span></div>
+      <div class="kpi-delta delta-up">▲ 6 this week</div>
+    </div>
+    <div class="kpi col-span-2 xl:col-span-1" style="--kpi-accent:linear-gradient(90deg,#06B6D4,#22C55E)">
+      <div class="kpi-label">Uptime SLA</div>
+      <div class="kpi-value"><span data-counter="99.97" data-decimals="2" data-suffix="%">0</span></div>
+      <div class="kpi-delta delta-up">▲ 0.012% WoW</div>
+    </div>
+  </div>
+
+  <!-- Main graph + total investment card -->
+  <div class="grid grid-cols-12 gap-4 mb-6 items-start">
+    <!-- Big chart -->
+    <div class="col-span-12 xl:col-span-8 card-glow">
+      <div class="flex items-center justify-between mb-1">
+        <div>
+          <div class="font-display text-lg font-semibold">Incident Volume</div>
+          <div class="flex items-baseline gap-3 mt-1">
+            <span id="chartTotal" class="font-display text-3xl font-bold">1,284</span>
+            <span id="chartDelta" class="pill pill-green text-[11px]">+6.7%</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-3 text-[11px] text-[color:var(--tx-3)]">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#FF4F59"></span>P1</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#F59E0B"></span>P2</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#8B5CF6"></span>P3</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#06B6D4"></span>Info</span>
+          </div>
+        </div>
+      </div>
+      <svg id="incidentChart" viewBox="0 0 720 210" class="w-full h-auto mt-2">
+        <defs>
+          <linearGradient id="aP1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4F59" stop-opacity=".5"/><stop offset="1" stop-color="#FF4F59" stop-opacity="0"/></linearGradient>
+          <linearGradient id="aP2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F59E0B" stop-opacity=".45"/><stop offset="1" stop-color="#F59E0B" stop-opacity="0"/></linearGradient>
+          <linearGradient id="aP3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8B5CF6" stop-opacity=".5"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/></linearGradient>
+          <linearGradient id="gLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC4899"/></linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g class="chart-grid"><line x1="40" y1="30" x2="700" y2="30"/><line x1="40" y1="80" x2="700" y2="80"/><line x1="40" y1="130" x2="700" y2="130"/><line x1="40" y1="180" x2="700" y2="180"/></g>
+        <g class="chart-axis"><text x="34" y="34" text-anchor="end">140</text><text x="34" y="84" text-anchor="end">100</text><text x="34" y="134" text-anchor="end">60</text><text x="34" y="184" text-anchor="end">20</text></g>
+        <!-- Smooth purple line (total) -->
+        <path fill="url(#aP3)" stroke="none" d="M40,160 C120,145 200,120 280,100 S440,55 520,50 S640,42 700,38 L700,200 L40,200 Z" opacity=".6"/>
+        <path fill="none" stroke="url(#gLine)" stroke-width="2.5" filter="url(#glow)"
+              d="M40,160 C120,145 200,120 280,100 S440,55 520,50 S640,42 700,38"/>
+        <!-- Pink line (P1) -->
+        <path fill="url(#aP1)" stroke="none" d="M40,185 C120,180 200,172 280,165 S440,150 520,148 S640,142 700,140 L700,200 L40,200 Z" opacity=".4"/>
+        <path fill="none" stroke="#EC4899" stroke-width="1.5" d="M40,185 C120,180 200,172 280,165 S440,150 520,148 S640,142 700,140" opacity=".7"/>
+        <!-- Tooltip marker -->
+        <circle cx="520" cy="50" r="5" fill="#8B5CF6" stroke="#fff" stroke-width="2" filter="url(#glow)"/>
+        <g transform="translate(475, 32)">
+          <rect x="0" y="0" width="90" height="24" rx="6" fill="rgba(139,92,246,.25)" stroke="rgba(139,92,246,.5)"/>
+          <text x="45" y="16" text-anchor="middle" fill="#fff" font-size="11" font-weight="600" font-family="Inter">+1.2%</text>
+        </g>
+        <g class="chart-axis"><text x="40" y="207">Jan</text><text x="112" y="207">Feb</text><text x="184" y="207">Mar</text><text x="256" y="207">Apr</text><text x="328" y="207">May</text><text x="400" y="207">Jun</text><text x="472" y="207">Jul</text><text x="544" y="207">Aug</text><text x="616" y="207">Sep</text></g>
+      </svg>
+    </div>
+
+    <!-- Right: Operational Health -->
+    <div class="col-span-12 xl:col-span-4 card-purple">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background:linear-gradient(135deg,#22C55E,#06B6D4)">⚡</span>
+        <span class="eyebrow">Operational Health</span>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[12px] text-[color:var(--tx-2)]">SLA Compliance</span>
+            <span class="font-display text-lg font-bold" style="color:#22C55E">99.97%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:99.97%;background:linear-gradient(90deg,#22C55E,#06B6D4)"></div></div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[12px] text-[color:var(--tx-2)]">Automation Rate</span>
+            <span class="font-display text-lg font-bold" style="color:#8B5CF6">73%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:73%"></div></div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[12px] text-[color:var(--tx-2)]">Avg MTTR</span>
+            <span class="font-display text-lg font-bold">2m 41s</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:13%;background:linear-gradient(90deg,#06B6D4,#22C55E)"></div></div>
+          <div class="text-[10px] font-mono text-[color:var(--tx-3)] mt-1">↓ from 20m avg · 87% reduction</div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[12px] text-[color:var(--tx-2)]">Signal-to-Noise</span>
+            <span class="font-display text-lg font-bold" style="color:#F59E0B">62%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:62%;background:linear-gradient(90deg,#F59E0B,#FF4F59)"></div></div>
+          <div class="text-[10px] font-mono text-[color:var(--tx-3)] mt-1">38% noise suppressed by Detector</div>
+        </div>
+      </div>
+
+      <!-- Agent fleet -->
+      <div class="mt-5 pt-4 border-t border-white/5">
+        <div class="eyebrow mb-3">Agent fleet · live</div>
+        <div id="agentGrid" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live stream + recent incidents -->
+  <div class="grid grid-cols-12 gap-4 mb-6">
+    <!-- Live stream -->
+    <div class="col-span-12 xl:col-span-5 card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-display text-[15px] font-semibold">Live Agent Stream</div>
+        <span class="live-tag" style="color:#22C55E">streaming</span>
+      </div>
+      <div id="liveActivity" class="min-h-[320px] max-h-[360px] overflow-y-auto"></div>
+    </div>
+
+    <!-- Recent incidents with mini-pipeline -->
+    <div class="col-span-12 xl:col-span-7 card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-display text-[15px] font-semibold">Recent Incidents</div>
+        <a href="demo.html" class="btn btn-ghost text-[12px]">Open NOC →</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Sev</th><th>Service</th><th>Pipeline</th><th>MTTR</th><th>Status</th></tr></thead>
+          <tbody id="incidentRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent utilization + Severity mix + Responsible AI -->
+  <div class="grid grid-cols-12 gap-4 mb-6" id="agents">
+    <!-- Agent utilization -->
+    <div class="col-span-12 lg:col-span-4 card">
+      <div class="font-display text-[15px] font-semibold mb-4">Agent Utilization</div>
+      <div id="agentBars" class="space-y-2.5"></div>
+    </div>
+
+    <!-- Severity donut -->
+    <div class="col-span-12 lg:col-span-4 card">
+      <div class="font-display text-[15px] font-semibold mb-3">Severity Mix · 7d</div>
+      <div class="flex items-center gap-5">
+        <svg viewBox="0 0 120 120" class="w-[130px] h-[130px] -rotate-90">
+          <circle cx="60" cy="60" r="48" fill="none" stroke="var(--bg-3)" stroke-width="14"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#FF4F59" stroke-width="14" stroke-dasharray="42 260"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#F59E0B" stroke-width="14" stroke-dasharray="78 260" stroke-dashoffset="-42"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#8B5CF6" stroke-width="14" stroke-dasharray="115 260" stroke-dashoffset="-120"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#06B6D4" stroke-width="14" stroke-dasharray="67 260" stroke-dashoffset="-235"/>
+        </svg>
+        <div class="space-y-2 text-[12px]">
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#FF4F59"></span>P1<span class="ml-auto font-mono font-semibold">14%</span></div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#F59E0B"></span>P2<span class="ml-auto font-mono font-semibold">26%</span></div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#8B5CF6"></span>P3<span class="ml-auto font-mono font-semibold">38%</span></div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#06B6D4"></span>Info<span class="ml-auto font-mono font-semibold">22%</span></div>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-white/5 space-y-2 text-[12px]">
+        <div><div class="flex justify-between mb-1"><span>Self-healed</span><span class="font-mono" style="color:#22C55E">73%</span></div><div class="progress-bar"><div class="progress-fill" style="width:73%;background:#22C55E"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>With approval</span><span class="font-mono" style="color:#F59E0B">22%</span></div><div class="progress-bar"><div class="progress-fill" style="width:22%;background:#F59E0B"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>Escalated</span><span class="font-mono" style="color:#FF4F59">5%</span></div><div class="progress-bar"><div class="progress-fill" style="width:5%;background:#FF4F59"></div></div></div>
+      </div>
+    </div>
+
+    <!-- Responsible AI scorecard -->
+    <div id="responsible" class="col-span-12 lg:col-span-4 card">
+      <div class="font-display text-[15px] font-semibold mb-4">Responsible AI</div>
+      <div class="space-y-3 text-[12.5px]">
+        <div><div class="flex justify-between mb-1"><span>Citation coverage</span><span class="font-mono">98.7%</span></div><div class="progress-bar"><div class="progress-fill" style="width:98.7%"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>PII redaction</span><span class="font-mono">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>Human gate · destructive</span><span class="font-mono">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>Hallucination eval</span><span class="font-mono">99.2%</span></div><div class="progress-bar"><div class="progress-fill" style="width:99.2%"></div></div></div>
+        <div><div class="flex justify-between mb-1"><span>Audit integrity</span><span class="font-mono">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-white/5">
+        <div class="flex items-center justify-between text-[12px]">
+          <div><span class="font-display font-semibold">Human Gates Today</span><div class="font-display text-2xl font-bold mt-1">14</div></div>
+          <div class="space-y-1 text-right text-[11px] font-mono">
+            <div style="color:#22C55E">12 approved · 41s avg</div>
+            <div style="color:#F59E0B">1 rollback</div>
+            <div style="color:#FF4F59">1 rejected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="flex items-center justify-between text-[12px] text-[color:var(--tx-3)] py-6 border-t border-white/5">
+    <div class="flex items-center gap-2"><span class="brand-dot"></span> ApexAssist · Genpact GenAI Hackathon 2026</div>
+    <div class="font-mono">Built with Claude · simulated telemetry</div>
+  </footer>
+</div>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
