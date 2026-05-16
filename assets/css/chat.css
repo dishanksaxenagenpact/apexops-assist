@@ -124,6 +124,18 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+.aa-bubble p { margin: 0 0 6px 0; }
+.aa-bubble p:last-child { margin-bottom: 0; }
+.aa-bubble ul, .aa-bubble ol { margin: 4px 0 6px 0; padding-left: 20px; }
+.aa-bubble li { margin: 2px 0; }
+.aa-bubble strong { color: #fff; font-weight: 700; }
+.aa-bubble em { color: rgba(255,255,255,.85); font-style: italic; }
+.aa-bubble code {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08);
+  padding: 1px 6px; border-radius: 4px; color: #C4B5FD;
+}
+.aa-bubble a { color: #C4B5FD; text-decoration: underline; }
 .aa-msg.aa-bot .aa-bubble {
   background: rgba(151,117,250,.12);
   border: 1px solid rgba(151,117,250,.22);

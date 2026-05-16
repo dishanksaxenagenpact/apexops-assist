@@ -93,7 +93,9 @@ async function signV4({ method, url, region, service, accessKey, secretKey, head
   const sortedKeys = Object.keys(headers).map(k => k.toLowerCase()).sort();
   const canonicalHeaders = sortedKeys.map(k => `${k}:${headers[k] ?? headers[Object.keys(headers).find(x=>x.toLowerCase()===k)]}\n`).join('');
   const signedHeaders = sortedKeys.join(';');
-  const canonicalRequest = `${method}\n${u.pathname}\n${u.search.slice(1)}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  // SigV4 requires path segments to be URI-encoded TWICE for non-S3 services.
+  const canonicalPath = u.pathname.split('/').map(seg => encodeURIComponent(seg)).join('/');
+  const canonicalRequest = `${method}\n${canonicalPath}\n${u.search.slice(1)}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
   const credentialScope = `${short}/${region}/${service}/aws4_request`;
   const stringToSign = `AWS4-HMAC-SHA256\n${full}\n${credentialScope}\n${await sha256Hex(canonicalRequest)}`;
   const kDate    = await hmac(enc.encode('AWS4' + secretKey), short);

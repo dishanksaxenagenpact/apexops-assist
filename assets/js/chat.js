@@ -173,6 +173,46 @@
   const $close = panel.querySelector('.aa-chat-close');
   const $suggest = panel.querySelector('#aa-suggest');
 
+  // Minimal, safe markdown renderer for bot bubbles.
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function mdToHtml(src) {
+    const lines = escapeHtml(src).split('\n');
+    const out = [];
+    let inUl = false, inOl = false;
+    const closeLists = () => {
+      if (inUl) { out.push('</ul>'); inUl = false; }
+      if (inOl) { out.push('</ol>'); inOl = false; }
+    };
+    const inline = (s) => s
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s.,;:)!?]|$)/g, '$1<em>$2</em>')
+      .replace(/\b(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+    for (const raw of lines) {
+      const line = raw.replace(/\s+$/, '');
+      const ol = line.match(/^\s*(\d+)\.\s+(.*)$/);
+      const ul = line.match(/^\s*[-*•]\s+(.*)$/);
+      if (ol) {
+        if (!inOl) { closeLists(); out.push('<ol>'); inOl = true; }
+        out.push(`<li>${inline(ol[2])}</li>`);
+      } else if (ul) {
+        if (!inUl) { closeLists(); out.push('<ul>'); inUl = true; }
+        out.push(`<li>${inline(ul[1])}</li>`);
+      } else if (line.trim() === '') {
+        closeLists();
+        out.push('');
+      } else {
+        closeLists();
+        out.push(`<p>${inline(line)}</p>`);
+      }
+    }
+    closeLists();
+    return out.join('\n');
+  }
+
   function addMessage(role, text, isError) {
     const msg = document.createElement('div');
     msg.className = 'aa-msg ' + (role === 'user' ? 'aa-user' : (isError ? 'aa-bot aa-error' : 'aa-bot'));
@@ -180,7 +220,12 @@
       <div class="aa-avatar">${role === 'user' ? 'You' : '⬡'}</div>
       <div class="aa-bubble"></div>
     `;
-    msg.querySelector('.aa-bubble').textContent = text;
+    const bubble = msg.querySelector('.aa-bubble');
+    if (role === 'user') {
+      bubble.textContent = text;
+    } else {
+      bubble.innerHTML = mdToHtml(text);
+    }
     $body.appendChild(msg);
     $body.scrollTop = $body.scrollHeight;
     return msg;
