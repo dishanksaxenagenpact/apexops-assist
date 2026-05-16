@@ -1,0 +1,22 @@
+<!--
+  Local-only config for the chat widget. NOT tracked in git.
+  Copy this file to `aa-config.html` (already gitignored) and fill in
+  your AWS keys for LOCAL testing only. Then in index.html / demo.html /
+  architecture.html, you can manually <!--#include or paste this snippet
+  before <script src="assets/js/chat.js"></script>.
+
+  PRODUCTION: deploy infra/bedrock-proxy.js as a Cloudflare Worker and
+  set only window.AA_CHAT_PROXY — never embed AWS keys in a public site.
+-->
+<script>
+  // ── Option A (recommended): use a server-side proxy ──
+  // window.AA_CHAT_PROXY = "https://your-worker.workers.dev";
+
+  // ── Option B (local dev only — keys exposed to browser) ──
+  // window.AA_AWS = {
+  //   region: "us-east-1",
+  //   modelId: "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  //   accessKeyId: "YOUR_KEY",
+  //   secretAccessKey: "YOUR_SECRET"
+  // };
+</script>
