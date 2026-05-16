@@ -15,6 +15,23 @@
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### Command Center — Premium Landing
+<img src="assets/screenshots/01-command-center.png" alt="ApexAssist Command Center landing page" width="100%"/>
+
+### Live Orchestrator — Real-time Agent Fabric
+<img src="assets/screenshots/03-live-orchestrator-idle.png" alt="ApexAssist Live Orchestrator with animated agent constellation" width="100%"/>
+
+### Architecture — Incident Resolution Flow
+<img src="assets/screenshots/04-architecture.png" alt="ApexAssist end-to-end architecture" width="100%"/>
+
+</div>
+
+---
+
 ## 🚨 The Problem
 
 A single Sev-1 incident at enterprise scale can cost **$500K–$2M per hour** in lost revenue, SLA penalties, and engineering toil. Today's response is fundamentally broken:
@@ -166,9 +183,15 @@ The live demo simulates incident resolution **for demonstration purposes only** 
 
 ---
 
-## 👥 Team
+## 👥 Team ApexOps
 
-**Team ApexAssist** · Genpact GenAI Hackathon 2026
+| Member | |
+| --- | --- |
+| **Dishank Saxena** | |
+| **Sreenivasan Masanamuthu** | |
+| **Mihir Patel** | |
+
+Genpact GenAI Hackathon 2026
 
 Built with ❤️ for engineers who deserve to sleep through the night.
 
